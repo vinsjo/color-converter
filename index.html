@@ -6,14 +6,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="./css/style.css">
-    <script src="./js/app.js" async></script>
+    <script src="./js/app.js" type="module" async></script>
     <title>Color Converter</title>
 </head>
 
 <body>
+    <main class="app">
+        <input class="input-slider" type="range" min="-50" max="50" value="0">
+        <input class="slider-value" type="number" min="-50" max="50" value="0"
+            disabled>
+        <!-- <section class="color-container">
+            <h2 class="color-title">HSL</h2>
+        </section>
+        <section class="color-container">
+            <h2 class="color-title">RGB</h2>
 
-
-
+        </section> -->
+    </main>
 </body>
 
 </html>

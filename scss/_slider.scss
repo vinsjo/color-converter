@@ -1,0 +1,111 @@
+@use "sass:math";
+@use "sass:color";
+
+@mixin slider-box-shadow() {
+	box-shadow: 1px 1px 1px #0a0a0a, 0 0 1px #0a0a0a;
+}
+
+@mixin slider-border($size, $color) {
+	border: $size solid $color;
+}
+
+@mixin slider-thumb($width, $height, $color, $border-color) {
+	width: $width;
+	height: $height;
+	background-color: $color;
+	cursor: pointer;
+	border-radius: $width * 0.2;
+	@include slider-border(1px, $border-color);
+	@include slider-box-shadow();
+}
+
+@mixin slider-track($width, $thickness, $color, $border-color) {
+	width: $width;
+	height: $thickness;
+	cursor: pointer;
+	background-color: $color;
+	border-radius: $thickness * 0.5;
+	@include slider-border(0.2px, $border-color);
+	@include slider-box-shadow();
+}
+
+@function focus-color($color) {
+	@return lighten($color, 20%);
+}
+
+@mixin slider(
+	$width,
+	$thickness,
+	$thumb-height,
+	$thumb-width,
+	$thumb-color,
+	$track-color,
+	$border-color
+) {
+	-webkit-appearance: none;
+	width: $width;
+	background: transparent;
+
+	&::focus {
+		outline: none;
+	}
+	&::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		margin-top: -$thumb-height * 0.5;
+		@include slider-thumb(
+			$thumb-width,
+			$thumb-height,
+			$thumb-color,
+			$border-color
+		);
+	}
+
+	&::-webkit-slider-runnable-track {
+		@include slider-track($width, $thickness, $track-color, $border-color);
+	}
+
+	&::focus::-webkit-slider-runnable-track {
+		background-color: focus-color($track-color);
+	}
+
+	&::-moz-range-thumb {
+		@include slider-thumb(
+			$thumb-width,
+			$thumb-height,
+			$thumb-color,
+			$border-color
+		);
+	}
+
+	&::-moz-range-track {
+		@include slider-track($width, $thickness, $track-color, $border-color);
+	}
+
+	&::-ms-thumb {
+		@include slider-thumb(
+			$thumb-width,
+			$thumb-height,
+			$thumb-color,
+			$border-color
+		);
+	}
+
+	&::-ms-fill-lower {
+		background-color: $track-color;
+		border-radius: $thickness * 0.5;
+		@include slider-border(0.2px, $border-color);
+		@include slider-box-shadow();
+	}
+	&::-ms-fill-upper {
+		background-color: $track-color;
+		border-radius: $thickness * 0.5;
+		@include slider-border(0.2px, $border-color);
+		@include slider-box-shadow();
+	}
+	&:focus::-ms-fill-lower {
+		background-color: focus-color($track-color);
+	}
+	&:focus::-ms-fill-upper {
+		background-color: focus-color($track-color);
+	}
+}
