@@ -1,12 +1,7 @@
 @use "sass:math";
 @use "sass:color";
 
-@mixin slider-hue-background($s: 80, $l: 50) {
-	background: rgb(
-		245,
-		245,
-		245
-	); /* For browsers that do not support gradients */
+@mixin slider-hue-background($s: 80%, $l: 50%) {
 	background: -webkit-linear-gradient(
 		left,
 		hsl(0, $s, $l),
@@ -67,17 +62,16 @@
 }
 
 @function focus-color($color) {
-	@return darken($color, 5%);
+	@return lighten($color, 5%);
 }
 
 @mixin slider($width, $height, $thumb-size, $thumb-color, $track-color) {
 	-webkit-appearance: none;
 	background-color: transparent;
 	@include slider-track($width, $height, $track-color);
-
 	&::-webkit-slider-thumb {
 		-webkit-appearance: none;
-		margin-top: ($height - $thumb-size) * 0.5;
+		margin-top: ($thumb-size - $height) * 0.5;
 		@include slider-thumb($thumb-size, $thumb-color);
 	}
 	&::-webkit-slider-runnable-track,
