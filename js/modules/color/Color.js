@@ -99,8 +99,25 @@ export default class Color {
 		);
 	}
 
+	static isHEX(c) {
+		if (typeof c !== "string" || c.length < 4 || c.charAt(0) != "#") {
+			return false;
+		}
+		let r, g, b;
+		if (c.length < 7) {
+			r = parseInt(c.charAt(1) + c.charAt(1), 16);
+			g = parseInt(c.charAt(2) + c.charAt(2), 16);
+			b = parseInt(c.charAt(3) + c.charAt(3), 16);
+		} else {
+			r = parseInt(c.charAt(1) + c.charAt(2), 16);
+			g = parseInt(c.charAt(3) + c.charAt(4), 16);
+			b = parseInt(c.charAt(5) + c.charAt(6), 16);
+		}
+		return isNum(r) && isNum(g) && isNum(b);
+	}
+
 	static isColor(c) {
-		return this.isRGB(c) || this.isHSL(c);
+		return this.isRGB(c) || this.isHSL(c) || this.isHEX(c);
 	}
 	//#endregion
 
@@ -125,6 +142,25 @@ export default class Color {
 			a: isNum(a) ? a : this.A_RANGE,
 		};
 		return constrainValues ? this.constrainHSL(hsl) : hsl;
+	}
+
+	static HEX(r, g, b, a, constrainValues = false) {
+		const rgb = this.RGB(r, g, b, a, constrainValues);
+		const hex = {
+			r: rgb.r.toString(16),
+			g: rgb.g.toString(16),
+			b: rgb.b.toString(16),
+			a:
+				rgb.a != this.A_RANGE
+					? map(rgb.a, 0, this.A_RANGE, 0, 100).toString()
+					: "",
+		};
+		for (const c in hex) {
+			if (hex[c] && hex[c].length < 2) {
+				hex[c] = "0" + hex[c];
+			}
+		}
+		return `#${hex.r}${hex.g}${hex.b}${hex.a}`;
 	}
 
 	static constrainRGB(color) {
@@ -156,7 +192,7 @@ export default class Color {
 	//#region STATIC CONVERSION METHODS
 
 	static RGBToHSL(color) {
-		if (!this.isRGB(color)) return this.HSL();
+		if (!this.isRGB(color)) return color;
 		const rgb = this.normalizeColor(color),
 			range = this.RANGE,
 			cmin = Math.min(rgb.r, rgb.g, rgb.b),
@@ -203,7 +239,7 @@ export default class Color {
 	}
 
 	static HSLToRGB(color) {
-		if (!this.isHSL(color)) return this.RGB();
+		if (!this.isHSL(color)) return color;
 		const range = this.RANGE;
 		const hsl = {...color};
 		hsl.h = euclideanModulo(hsl.h, range.h);
@@ -267,71 +303,88 @@ export default class Color {
 		return rgb;
 	}
 
+	static RGBToHEX(color) {
+		if (!this.isRGB(color)) return color;
+		return this.HEX(color.r, color.g, color.b, color.a, true);
+	}
+
+	static HSLToHEX(color) {
+		if (!this.isHSL(color)) return color;
+		return this.RGBToHEX(this.HSLToRGB(color));
+	}
+
+	static HEXToRGB(color) {
+		if (!this.isHEX(color)) return color;
+		let r = 0,
+			g = 0,
+			b = 0,
+			a;
+		r = parseInt(color.charAt(1) + color.charAt(2), 16);
+		g = parseInt(color.charAt(3) + color.charAt(4), 16);
+		b = parseInt(color.charAt(5) + color.charAt(6), 16);
+		if (color.length == 8) {
+			a = parseInt(color.charAt(7), 16);
+		} else if (color.length == 9) {
+			a = parseInt(color.charAt(7) + color.charAt(8), 16);
+		}
+		if (isNum(a)) {
+			a = map(a, 0, 100, 0, this.A_RANGE, true);
+		}
+		return this.RGB(r, g, b, a, true);
+	}
+
+	static HEXToHSL(color) {
+		if (!this.isHEX(color)) return color;
+		return this.RGBToHSL(this.HEXToRGB(color));
+	}
+
 	static toString(color) {
-		if (!this.isColor(color)) return color;
+		if (this.isHEX(color) || !this.isColor(color)) return color;
 		if (this.isHSL(color)) {
 			const c = this.roundHSL(color);
 			if (c.a != 1) {
-				return `hsla(${c.h},${c.s},${c.l},${c.a})`;
+				return `hsla(${c.h}, ${c.s}%, ${c.l}%, ${c.a})`;
 			}
-			return `hsl(${c.h},${c.s},${c.l})`;
+			return `hsl(${c.h}, ${c.s}%, ${c.l}%)`;
 		}
 		const c = this.roundRGB(color);
 		if (color.a != 1) {
-			return `rgba(${c.r},${c.g},${c.b},${c.a})`;
+			return `rgba(${c.r}, ${c.g}, ${c.b}, ${c.a})`;
 		}
-		return `rgb(${c.r},${c.g},${c.b})`;
+		return `rgb(${c.r}, ${c.g}, ${c.b})`;
 	}
 
 	//#region STATIC MODIFYING METHODS
 
-	static roundHSL(color, hRange, sRange, lRange, aRange) {
+	static roundHSL(color) {
 		if (!this.isHSL(color)) return color;
-		const hsl = {...color},
-			range = this.RANGE,
-			precision = this.HSL(
-				hRange ? hRange : range.h,
-				sRange ? sRange : range.s,
-				lRange ? lRange : range.l,
-				aRange ? aRange : range.a
-			);
-		for (const c in precision) {
-			if (isNum(hsl[c]) && !isInt(hsl[c])) {
-				precision[c] =
-					precision[c] >= 255
-						? 0
-						: precision[c] / 100 >= 1
-						? 1
-						: precision[c] / 10 >= 1
-						? 2
-						: 3;
-				hsl[c] = roundFloat(hsl[c], precision[c]);
-			}
-		}
+		const hsl = {...color};
+		hsl.h = Math.round(hsl.h);
+		hsl.l = roundFloat(hsl.l);
+		hsl.s = roundFloat(hsl.s);
+		hsl.a = roundFloat(hsl.a, 2);
 		return hsl;
 	}
 
-	static roundRGB(color, rgbRange, aRange) {
+	static roundRGB(color) {
 		if (!this.isRGB(color)) return color;
-		const rgb = {...color},
-			range = this.RANGE;
-		rgbRange && isNum(rgbRange) && (range.rgb = rgbRange);
-		aRange && isNum(aRange) && (range.a = aRange);
-		const precision = this.RGB(range.rgb, range.rgb, range.rgb, range.a);
-		for (const c in precision) {
-			if (isNum(rgb[c]) && !isInt(rgb[c])) {
-				precision[c] =
-					precision[c] >= 255
-						? 0
-						: precision[c] / 100 >= 1
-						? 1
-						: precision[c] / 10 >= 1
-						? 2
-						: 3;
-				rgb[c] = roundFloat(rgb[c], precision[c]);
-			}
-		}
+		const rgb = {...color};
+		rgb.r = Math.round(rgb.r);
+		rgb.g = Math.round(rgb.g);
+		rgb.b = Math.round(rgb.b);
+		rgb.a = roundFloat(rgb.a, 2);
 		return rgb;
+	}
+
+	static invertRGB(color) {
+		if (!this.isRGB(color)) return color;
+		const range = this.RGB_RANGE;
+		return this.RGB(
+			range - color.r,
+			range - color.g,
+			range - color.b,
+			true
+		);
 	}
 
 	static normalizeColor(color) {

@@ -1,111 +1,124 @@
 @use "sass:math";
 @use "sass:color";
 
-@mixin slider-box-shadow() {
-	box-shadow: 1px 1px 1px #0a0a0a, 0 0 1px #0a0a0a;
+@mixin slider-hue-background($s: 80, $l: 50) {
+	background: rgb(
+		245,
+		245,
+		245
+	); /* For browsers that do not support gradients */
+	background: -webkit-linear-gradient(
+		left,
+		hsl(0, $s, $l),
+		hsl(60, $s, $l),
+		hsl(120, $s, $l),
+		hsl(180, $s, $l),
+		hsl(240, $s, $l),
+		hsl(300, $s, $l),
+		hsl(360, $s, $l)
+	); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(
+		right,
+		hsl(0, $s, $l),
+		hsl(60, $s, $l),
+		hsl(120, $s, $l),
+		hsl(180, $s, $l),
+		hsl(240, $s, $l),
+		hsl(300, $s, $l),
+		hsl(360, $s, $l)
+	); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient(
+		right,
+		hsl(0, $s, $l),
+		hsl(60, $s, $l),
+		hsl(120, $s, $l),
+		hsl(180, $s, $l),
+		hsl(240, $s, $l),
+		hsl(300, $s, $l),
+		hsl(360, $s, $l)
+	); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(
+		to right,
+		hsl(0, $s, $l),
+		hsl(60, $s, $l),
+		hsl(120, $s, $l),
+		hsl(180, $s, $l),
+		hsl(240, $s, $l),
+		hsl(300, $s, $l),
+		hsl(360, $s, $l)
+	); /* Standard syntax (must be last) */
 }
 
-@mixin slider-border($size, $color) {
-	border: $size solid $color;
+@mixin slider-thumb($size, $color) {
+	width: $size;
+	height: $size;
+	background-color: $color;
+	cursor: pointer;
+	border-radius: $size * 0.5;
 }
 
-@mixin slider-thumb($width, $height, $color, $border-color) {
+@mixin slider-track($width, $height, $color) {
 	width: $width;
 	height: $height;
-	background-color: $color;
-	cursor: pointer;
-	border-radius: $width * 0.2;
-	@include slider-border(1px, $border-color);
-	@include slider-box-shadow();
-}
-
-@mixin slider-track($width, $thickness, $color, $border-color) {
-	width: $width;
-	height: $thickness;
 	cursor: pointer;
 	background-color: $color;
-	border-radius: $thickness * 0.5;
-	@include slider-border(0.2px, $border-color);
-	@include slider-box-shadow();
+	border-radius: $height * 0.5;
+	outline: none;
 }
 
 @function focus-color($color) {
-	@return lighten($color, 20%);
+	@return darken($color, 5%);
 }
 
-@mixin slider(
-	$width,
-	$thickness,
-	$thumb-height,
-	$thumb-width,
-	$thumb-color,
-	$track-color,
-	$border-color
-) {
+@mixin slider($width, $height, $thumb-size, $thumb-color, $track-color) {
 	-webkit-appearance: none;
-	width: $width;
-	background: transparent;
+	background-color: transparent;
+	@include slider-track($width, $height, $track-color);
 
-	&::focus {
-		outline: none;
-	}
 	&::-webkit-slider-thumb {
 		-webkit-appearance: none;
-		margin-top: -$thumb-height * 0.5;
-		@include slider-thumb(
-			$thumb-width,
-			$thumb-height,
-			$thumb-color,
-			$border-color
-		);
+		margin-top: ($height - $thumb-size) * 0.5;
+		@include slider-thumb($thumb-size, $thumb-color);
 	}
-
-	&::-webkit-slider-runnable-track {
-		@include slider-track($width, $thickness, $track-color, $border-color);
-	}
-
-	&::focus::-webkit-slider-runnable-track {
-		background-color: focus-color($track-color);
-	}
-
-	&::-moz-range-thumb {
-		@include slider-thumb(
-			$thumb-width,
-			$thumb-height,
-			$thumb-color,
-			$border-color
-		);
-	}
-
-	&::-moz-range-track {
-		@include slider-track($width, $thickness, $track-color, $border-color);
-	}
-
-	&::-ms-thumb {
-		@include slider-thumb(
-			$thumb-width,
-			$thumb-height,
-			$thumb-color,
-			$border-color
-		);
-	}
-
-	&::-ms-fill-lower {
-		background-color: $track-color;
-		border-radius: $thickness * 0.5;
-		@include slider-border(0.2px, $border-color);
-		@include slider-box-shadow();
-	}
+	&::-webkit-slider-runnable-track,
+	&::-moz-range-track,
+	&::-ms-fill-lower,
 	&::-ms-fill-upper {
-		background-color: $track-color;
-		border-radius: $thickness * 0.5;
-		@include slider-border(0.2px, $border-color);
-		@include slider-box-shadow();
+		@include slider-track($width, $height, $track-color);
 	}
-	&:focus::-ms-fill-lower {
-		background-color: focus-color($track-color);
+
+	&::-moz-range-thumb,
+	&::-ms-thumb {
+		@include slider-thumb($thumb-size, $thumb-color);
 	}
-	&:focus::-ms-fill-upper {
+
+	&::-webkit-slider-thumb:hover {
+		background-color: darken($thumb-color, 5%);
+	}
+	&::-moz-range-thumb:hover {
+		background-color: darken($thumb-color, 5%);
+	}
+	&::-ms-thumb:hover {
+		background-color: darken($thumb-color, 5%);
+	}
+
+	&::-webkit-slider-runnable-track:hover,
+	&::-webkit-slider-runnable-track:focus {
 		background-color: focus-color($track-color);
+		border-radius: $height * 0.5;
+	}
+
+	&::-moz-range-track:hover,
+	&::-moz-range-track:focus {
+		background-color: focus-color($track-color);
+		border-radius: $height * 0.5;
+	}
+
+	&::-ms-fill-lower:focus,
+	&::-ms-fill-upper:focus,
+	&::-ms-fill-lower:hover,
+	&::-ms-fill-upper:hover {
+		background-color: focus-color($track-color);
+		border-radius: $height * 0.5;
 	}
 }

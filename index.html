@@ -11,17 +11,26 @@
 </head>
 
 <body>
-    <main class="app">
-        <input class="input-slider" type="range" min="-50" max="50" value="0">
-        <input class="slider-value" type="number" min="-50" max="50" value="0"
-            disabled>
-        <!-- <section class="color-container">
-            <h2 class="color-title">HSL</h2>
-        </section>
-        <section class="color-container">
-            <h2 class="color-title">RGB</h2>
+    <main>
+        <div class="app">
+            <div class="color-output rgb">
+                <input class="color-text rgb" type="text" value="" disabled>
+            </div>
+            <div class="color-output hsl">
+                <input class="color-text hsl" type="text" value="" disabled>
+            </div>
+            <div class="color-output hex">
+                <input class="color-text hex" type="text" value="" disabled>
+            </div>
 
-        </section> -->
+            <label class="slider-label" for="hue">hue</label>
+            <input id="hue" class="input-slider hue" type="range">
+            <label class="slider-label" for="saturation">saturation</label>
+            <input id="saturation" class="input-slider sat" type="range">
+            <label class="slider-label" for="lightness">lightness</label>
+            <input id="lightness" class="input-slider light" type="range">
+
+        </div>
     </main>
 </body>
 
