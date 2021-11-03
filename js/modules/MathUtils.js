@@ -6,7 +6,6 @@ export {
 	isNum,
 	isInt,
 	isFloat,
-	overZero,
 	roundFloat,
 	constrain,
 	normalize,
@@ -50,10 +49,6 @@ function isFloat(value) {
 	return typeof value === "number" && value % 1 === 0;
 }
 
-function overZero(value) {
-	return typeof value === "number" && value > 0;
-}
-
 /**
  * Round a number while preserving a specified precision
  *
@@ -63,6 +58,7 @@ function overZero(value) {
  * @return {Number}               rounded float value
  */
 function roundFloat(n, precision = 1) {
+	if (typeof n !== "number" || typeof precision !== "number") return n;
 	if (!n || !precision) return n;
 	const m = 10 ** precision;
 	return Math.round(n * m) / m;
@@ -80,6 +76,13 @@ function roundFloat(n, precision = 1) {
  * @return {Number}       constrained number
  */
 function constrain(n, low, high) {
+	if (
+		typeof n !== "number" ||
+		typeof low !== "number" ||
+		typeof high !== "number"
+	) {
+		return n;
+	}
 	return Math.max(Math.min(n, high), low);
 }
 
@@ -109,7 +112,16 @@ function normalize(n, low, high) {
  * @param  {Boolean} [constrainValue]  constrain the value to the newly mapped range
  * @return {Number}                remapped number
  */
-function map(n, start1, stop1, start2, stop2, constrainValue) {
+function map(n, start1, stop1, start2, stop2, constrainValue = true) {
+	if (
+		typeof n !== "number" ||
+		typeof start1 !== "number" ||
+		typeof start2 !== "number" ||
+		typeof stop1 !== "number" ||
+		typeof stop2 !== "number"
+	) {
+		return n;
+	}
 	const val = ((n - start1) / (stop1 - start1)) * (stop2 - start2) + start2;
 	const min = Math.min(start2, stop2);
 	const max = Math.max(start2, stop2);
@@ -131,6 +143,14 @@ function map(n, start1, stop1, start2, stop2, constrainValue) {
  *
  */
 function segmentMap(n, segments, low, high) {
+	if (
+		typeof n !== "number" ||
+		typeof segments !== "number" ||
+		typeof low !== "number" ||
+		typeof high !== "number"
+	) {
+		return n;
+	}
 	return euclideanModulo(
 		Math.floor(map(n, low, high, 0, segments, true)),
 		segments
@@ -138,7 +158,7 @@ function segmentMap(n, segments, low, high) {
 }
 
 /**
- * MathUtils.euclideanModulo function from threejs:
+ * Based on MathUtils.euclideanModulo function from threejs:
  * https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js#L49
  *
  * compute euclidian modulo of m % n
@@ -150,6 +170,7 @@ function segmentMap(n, segments, low, high) {
  * @return {Number}    a number between min and the max
  */
 function euclideanModulo(n, max) {
+	if (typeof n !== "number" || typeof max !== "number") return n;
 	return ((n % max) + max) % max;
 }
 
@@ -163,6 +184,7 @@ function euclideanModulo(n, max) {
  * @return {Number}       Y value at the normalized value of X, between tMin and tMax
  */
 function parabola(x) {
+	if (typeof x !== "number") return x;
 	const h = 0.5,
 		a = -4;
 	return a * Math.pow(x - h, 2) + 1;
@@ -182,6 +204,15 @@ function parabola(x) {
  * @return {Number}       Y value at the normalized value of X
  */
 function cubicBezier(x, y1, y2, y3, y4) {
+	if (
+		typeof x !== "number" ||
+		typeof y1 !== "number" ||
+		typeof y2 !== "number" ||
+		typeof y3 !== "number" ||
+		typeof y4 !== "number"
+	) {
+		return x;
+	}
 	const t = x;
 	const y =
 		Math.pow(1 - t, 3) * y1 +

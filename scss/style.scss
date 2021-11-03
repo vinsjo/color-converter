@@ -6,13 +6,15 @@
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
-}
-html body {
 	overflow-x: hidden;
 }
-body {
-	height: 100vh;
+html {
 	width: 100vw;
+	height: 100vh;
+}
+body {
+	height: 100%;
+	width: 100%;
 	font-family: $main-font;
 	@include set-background($body-background);
 }
@@ -21,67 +23,70 @@ main {
 	width: 100%;
 	height: 100%;
 	display: flex;
-	flex-flow: column nowrap;
 	justify-content: center;
 	align-items: center;
 }
 
 .app {
-	width: 100%;
-	min-width: 250px;
-	max-width: 400px;
-	height: 100%;
-	min-height: 500px;
-	max-height: 600px;
-	padding: 10px 20px;
-	display: flex;
-	flex-flow: column nowrap;
-	justify-content: center;
-	align-items: center;
+	width: 350px;
+	height: 550px;
+	max-width: 100%;
+	max-height: 100%;
+	font-size: 1rem;
+	padding: 2em 1em;
+	display: grid;
+	grid-template-rows: repeat(3, 2fr) repeat(3, 1.25fr);
+	gap: 1em;
 	border-radius: 10px;
 
 	@include set-background($content-background);
 
-	.input-slider {
-		@include slider.slider(
-			100%,
-			24px,
-			24px,
-			darken($content-background, 10%),
-			$body-background
-		);
-		margin-top: 10px;
-		margin-bottom: 15px;
-	}
-
-	.slider-label {
-		display: block;
-		text-align: left;
-		width: 100%;
-		font-size: 16px;
-	}
-
 	.color-output {
 		width: 100%;
-		height: 10%;
-		min-height: 80px;
+		height: 100%;
+		max-height: 5rem;
 		background-color: rgb(0, 0, 0);
-		margin-bottom: 10px;
 		display: flex;
-		flex-flow: column nowrap;
 		justify-content: center;
 		align-items: center;
-		border-radius: 10px;
-		&:last-of-type {
-			margin-bottom: 20px;
+		border-radius: 8px;
+		align-self: start;
+		cursor: pointer;
+		& * {
+			cursor: pointer;
 		}
+
 		.color-text {
 			text-align: center;
 			background-color: transparent;
 			border: none;
 			outline: none;
-			font-size: 18px;
 			font-weight: 700;
+		}
+	}
+	.slider-container {
+		width: 100%;
+		height: 100%;
+		max-height: 3em;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: flex-start;
+		align-self: end;
+		.input-slider {
+			@include slider.slider(
+				100%,
+				1.5em,
+				1.5em,
+				darken($content-background, 10%),
+				$body-background
+			);
+		}
+
+		.slider-label {
+			display: block;
+			text-align: left;
+			width: 100%;
 		}
 	}
 }

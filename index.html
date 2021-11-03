@@ -5,8 +5,8 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="./css/style.css">
-    <script src="./js/app.js" type="module" async></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+
     <title>Color Converter</title>
 </head>
 
@@ -22,16 +22,21 @@
             <div class="color-output hex">
                 <input class="color-text hex" type="text" value="" disabled>
             </div>
-
-            <label class="slider-label" for="hue">hue</label>
-            <input id="hue" class="input-slider hue" type="range">
-            <label class="slider-label" for="saturation">saturation</label>
-            <input id="saturation" class="input-slider sat" type="range">
-            <label class="slider-label" for="lightness">lightness</label>
-            <input id="lightness" class="input-slider light" type="range">
-
+            <div class="slider-container">
+                <label class="slider-label" for="hue">hue</label>
+                <input id="hue" class="input-slider hue" type="range">
+            </div>
+            <div class="slider-container">
+                <label class="slider-label" for="saturation">saturation</label>
+                <input id="saturation" class="input-slider sat" type="range">
+            </div>
+            <div class="slider-container">
+                <label class="slider-label" for="lightness">lightness</label>
+                <input id="lightness" class="input-slider light" type="range">
+            </div>
         </div>
     </main>
+    <script src="js/app.js" type="module"></script>
 </body>
 
 </html>

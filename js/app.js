@@ -1,6 +1,6 @@
 "use strict";
-import Color from "./modules/color/Color.js";
-import {isNum, map} from "./modules/helpers/MathUtils.js";
+import Color from "./modules/Color.js";
+import {constrain} from "./modules/MathUtils.js";
 
 const outputs = {
 	rgb: colorOutputObject(
@@ -22,8 +22,8 @@ const inputs = {
 	sat: sliderDisplayObject(document.querySelector(".input-slider.sat")),
 	light: sliderDisplayObject(document.querySelector(".input-slider.light")),
 };
-
-initInputs(0, 100, 50);
+const initC = Color.toHSL(Color.randomRGB());
+initInputs(initC.h, initC.s, initC.l);
 initOutputs();
 updateAll();
 
@@ -34,11 +34,11 @@ function sliderDisplayObject(slider) {
 			return parseInt(this.slider.value);
 		},
 		set val(val) {
-			if (isNum(val)) {
+			if (typeof val === "number") {
 				this.slider.value = val.toString();
 			} else if (typeof val === "string") {
 				let num = parseInt(val);
-				if (isNum(num)) {
+				if (typeof num === "number") {
 					this.slider.value = num.toString();
 				}
 			}
@@ -62,16 +62,12 @@ function colorOutputObject(colorBox, colorText) {
 		get textColor() {
 			return this.text.style.color;
 		},
-		set textColor(color) {
-			if (typeof color === "string") {
-				this.text.style.color = color;
-			} else if (Color.isColor(color)) {
-				this.text.style.color = Color.toString(color);
-			}
+		set textColor(c) {
+			if (!Color.isColor(c)) return;
+			this.text.style.color = Color.toString(c);
 		},
 		updateBG() {
-			const c = this.color;
-			const bgColor = Color.toString(c);
+			const bgColor = Color.toString(this.color);
 			this.text.value = bgColor;
 			this.box.style.backgroundColor = bgColor;
 		},
@@ -80,10 +76,16 @@ function colorOutputObject(colorBox, colorText) {
 
 function updateAll() {
 	const hsl = Color.roundHSL(
-		Color.HSL(inputs.hue.val, inputs.sat.val, inputs.light.val, true)
+		Color.HSL(
+			parseInt(inputs.hue.val),
+			parseInt(inputs.sat.val),
+			parseInt(inputs.light.val),
+			true
+		)
 	);
 	const rgb = Color.HSLToRGB(hsl);
 	const hex = Color.RGBToHEX(Color.roundRGB(rgb));
+	document.body.style.backgroundColor = hex;
 	outputs.rgb.color = rgb;
 	outputs.hsl.color = hsl;
 	outputs.hex.color = hex;
@@ -94,12 +96,13 @@ function updateAll() {
 }
 
 function initInputs(h = 0, s = 100, l = 50) {
-	inputs.hue.slider.max = Color.H_RANGE;
-	inputs.sat.slider.max = Color.S_RANGE;
-	inputs.light.slider.max = Color.L_RANGE;
-	inputs.hue.val = isNum(h) ? h : 0;
-	inputs.sat.val = isNum(s) ? s : 0;
-	inputs.light.val = isNum(l) ? l : 0;
+	const range = Color.RANGE;
+	inputs.hue.slider.max = range.h;
+	inputs.sat.slider.max = range.s;
+	inputs.light.slider.max = range.l;
+	inputs.hue.val = constrain(h, 0, range.h);
+	inputs.sat.val = constrain(s, 0, range.s);
+	inputs.light.val = constrain(l, 0, range.l);
 	for (const i in inputs) {
 		inputs[i].slider.min = 0;
 		inputs[i].slider.onchange = updateAll;
@@ -110,10 +113,15 @@ function initInputs(h = 0, s = 100, l = 50) {
 function initOutputs() {
 	for (const i in outputs) {
 		outputs[i].box.onclick = () => {
+			const v = outputs[i].text.value;
 			outputs[i].text.select();
 			outputs[i].text.setSelectionRange(0, 99999);
-			navigator.clipboard.writeText(outputs[i].text.value);
-			console.log("Copied: " + outputs[i].text.value);
+			navigator.clipboard.writeText(v);
+			outputs[i].text.value = "Copied!";
+			setTimeout(() => {
+				outputs[i].text.value = v;
+			}, 1000);
+			console.log("Copied: " + v);
 		};
 	}
 }
