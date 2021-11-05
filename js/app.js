@@ -1,6 +1,7 @@
 "use strict";
 import Color from "./modules/Color.js";
 import {constrain} from "./modules/MathUtils.js";
+import {containDocumentBody} from "./modules/Utils.js";
 
 const outputs = {
 	rgb: colorOutputObject(
@@ -22,10 +23,19 @@ const inputs = {
 	sat: sliderDisplayObject(document.querySelector(".input-slider.sat")),
 	light: sliderDisplayObject(document.querySelector(".input-slider.light")),
 };
+
 const initC = Color.toHSL(Color.randomRGB());
-initInputs(initC.h, initC.s, initC.l);
-initOutputs();
-updateAll();
+
+window.onload = () => {
+	containDocumentBody();
+	window.onresize = () => {
+		containDocumentBody();
+	};
+	initInputs(initC.h, initC.s, initC.l);
+	initOutputs();
+	updateAll();
+	document.querySelector(".app").classList.add("show");
+};
 
 function sliderDisplayObject(slider) {
 	return {
